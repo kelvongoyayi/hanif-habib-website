@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Document, Page } from 'react-pdf';
+import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, Download, X, Maximize2, Minimize2, ZoomIn, ZoomOut, Calendar, Newspaper } from 'lucide-react';
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 
-// Worker configuration is now handled in main.tsx
+// Configure worker here before any PDF operations
+pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs';
 
 interface PDFViewerProps {
   pdfUrl: string;
@@ -30,7 +31,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 800);
-  const [retryCount, setRetryCount] = useState<number>(0);
   const viewerRef = useRef<HTMLDivElement>(null);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -43,31 +43,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const onDocumentLoadError = (error: Error) => {
     console.error('Error loading PDF:', error);
     console.error('PDF URL:', pdfUrl);
-    
-    // If this is a worker error and we haven't retried yet, try with CDN worker
-    if (error.message.includes('worker') && retryCount < 2) {
-      console.log('Retrying with CDN worker...');
-      setRetryCount(prev => prev + 1);
-      // Force a re-render which will use the fallback worker
-      import('react-pdf').then(({ pdfjs }) => {
-        // Try different CDN sources
-        const cdnSources = [
-          `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`,
-          `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`,
-          `https://unpkg.com/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs`
-        ];
-        
-        // Try the first available CDN
-        pdfjs.GlobalWorkerOptions.workerSrc = cdnSources[retryCount] || cdnSources[0];
-        console.log('Using CDN worker:', pdfjs.GlobalWorkerOptions.workerSrc);
-        
-        setError(null);
-        setLoading(true);
-      });
-    } else {
-      setError(`Failed to load PDF: ${error.message}`);
-      setLoading(false);
-    }
+    setError(`Failed to load PDF: ${error.message}`);
+    setLoading(false);
   };
 
   const changePage = (offset: number) => {
@@ -260,7 +237,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                   onClick={() => {
                     setError(null);
                     setLoading(true);
-                    setRetryCount(0);
                   }}
                   className="inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors text-sm"
                 >
@@ -278,7 +254,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           loading={<div className="h-full w-full flex items-center justify-center"></div>}
           className="mx-auto"
           options={documentOptions}
-          key={retryCount} // Force re-render on retry
         >
           {!error && (
             <Page 
