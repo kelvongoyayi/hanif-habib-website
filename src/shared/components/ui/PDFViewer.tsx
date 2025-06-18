@@ -30,6 +30,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 800);
+  const [retryCount, setRetryCount] = useState<number>(0);
   const viewerRef = useRef<HTMLDivElement>(null);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -42,8 +43,21 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const onDocumentLoadError = (error: Error) => {
     console.error('Error loading PDF:', error);
     console.error('PDF URL:', pdfUrl);
-    setError(`Failed to load PDF: ${error.message}`);
-    setLoading(false);
+    
+    // If this is a worker error and we haven't retried yet, try with CDN worker
+    if (error.message.includes('worker') && retryCount < 1) {
+      console.log('Retrying with CDN worker...');
+      setRetryCount(prev => prev + 1);
+      // Force a re-render which will use the fallback worker
+      import('react-pdf').then(({ pdfjs }) => {
+        pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+        setError(null);
+        setLoading(true);
+      });
+    } else {
+      setError(`Failed to load PDF: ${error.message}`);
+      setLoading(false);
+    }
   };
 
   const changePage = (offset: number) => {
@@ -236,6 +250,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                   onClick={() => {
                     setError(null);
                     setLoading(true);
+                    setRetryCount(0);
                   }}
                   className="inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors text-sm"
                 >
@@ -253,6 +268,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           loading={<div className="h-full w-full flex items-center justify-center"></div>}
           className="mx-auto"
           options={documentOptions}
+          key={retryCount} // Force re-render on retry
         >
           {!error && (
             <Page 
