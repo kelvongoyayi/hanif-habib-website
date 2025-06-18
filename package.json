@@ -1,4 +1,9 @@
 {
+  "name": "hanif-habib-website",
+  "version": "1.0.0",
+  "description": "Professional website for Hanif Habib & Co. - Tax and Business Advisory Services",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
