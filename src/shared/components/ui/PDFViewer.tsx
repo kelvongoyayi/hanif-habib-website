@@ -45,12 +45,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     console.error('PDF URL:', pdfUrl);
     
     // If this is a worker error and we haven't retried yet, try with CDN worker
-    if (error.message.includes('worker') && retryCount < 1) {
+    if (error.message.includes('worker') && retryCount < 2) {
       console.log('Retrying with CDN worker...');
       setRetryCount(prev => prev + 1);
       // Force a re-render which will use the fallback worker
       import('react-pdf').then(({ pdfjs }) => {
-        pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+        // Try different CDN sources
+        const cdnSources = [
+          `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`,
+          `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`,
+          `https://unpkg.com/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs`
+        ];
+        
+        // Try the first available CDN
+        pdfjs.GlobalWorkerOptions.workerSrc = cdnSources[retryCount] || cdnSources[0];
+        console.log('Using CDN worker:', pdfjs.GlobalWorkerOptions.workerSrc);
+        
         setError(null);
         setLoading(true);
       });
