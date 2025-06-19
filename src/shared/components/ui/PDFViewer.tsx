@@ -211,7 +211,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       )}
       
       {/* PDF Document */}
-      <div className="flex-1 overflow-auto bg-[#1b1b1b] flex items-center justify-center">
+      <div className="flex-1 overflow-auto bg-[#1b1b1b] flex items-center justify-center p-4">
         {loading && (
           <div className="text-center py-10">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
@@ -247,25 +247,27 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
           </div>
         )}
         
-        <Document
-          file={pdfUrl}
-          onLoadSuccess={onDocumentLoadSuccess}
-          onLoadError={onDocumentLoadError}
-          loading={<div className="h-full w-full flex items-center justify-center"></div>}
-          className="mx-auto"
-          options={documentOptions}
-        >
-          {!error && (
-            <Page 
-              pageNumber={pageNumber} 
-              scale={scale}
-              renderTextLayer={true}
-              renderAnnotationLayer={true}
-              className="shadow-xl max-w-full"
-              width={getPDFWidth()}
-            />
-          )}
-        </Document>
+        <div className={`${!loading && !error ? 'flex items-center justify-center w-full h-full' : 'hidden'}`}>
+          <Document
+            file={pdfUrl}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={onDocumentLoadError}
+            loading={<div className="h-full w-full flex items-center justify-center"></div>}
+            className="flex items-center justify-center"
+            options={documentOptions}
+          >
+            {!error && (
+              <Page 
+                pageNumber={pageNumber} 
+                scale={scale}
+                renderTextLayer={true}
+                renderAnnotationLayer={true}
+                className="shadow-xl"
+                width={scale > 1.0 ? undefined : getPDFWidth()}
+              />
+            )}
+          </Document>
+        </div>
       </div>
       
       {/* Footer with pagination */}

@@ -25,13 +25,22 @@ const Resources = () => {
     return params.get('category') || 'all';
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const { isIntersecting: isInView, ref: sectionRef } = useIntersectionObserver();
 
+  // Add a loading state that completes after initial render
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Filter resources based on search
-  const filterBySearch = (items: any[]) => {
+  const filterBySearch = <T extends { title: string; description: string }>(items: T[]): T[] => {
     if (!searchQuery) return items;
     
-    return items.filter((item: any) => 
+    return items.filter((item) => 
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -67,7 +76,7 @@ const Resources = () => {
       resourceCategories={resourceCategories}
     >
       <div ref={sectionRef as React.RefObject<HTMLDivElement>} className={`transition-all duration-1000 ${
-        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        (isInView || !isLoading) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
       }`}>
         {/* Conditionally render based on search query */}
         {searchQuery ? (
@@ -96,7 +105,7 @@ const Resources = () => {
               <MediaResourceGrid 
                 publications={filteredMediaPublications}
                 title="Media Publications"
-                isVisible={isInView}
+                isVisible={isInView || !isLoading}
                 isAnimated={true}
               />
             )}
@@ -176,7 +185,7 @@ const Resources = () => {
                 publications={activeCategory === 'all' ? mediaPublications.slice(0, 3) : mediaPublications}
                 showViewAllButton={activeCategory === 'all'}
                 onViewAllClick={() => setActiveCategory('media')}
-                isVisible={isInView}
+                isVisible={isInView || !isLoading}
                 isAnimated={true}
               />
             )}

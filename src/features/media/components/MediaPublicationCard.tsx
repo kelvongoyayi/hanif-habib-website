@@ -82,12 +82,13 @@ const MediaPublicationCard: React.FC<MediaPublicationCardProps> = ({
           />
           
           {/* Gradient overlay - accessible with keyboard focus */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 md:group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+            {/* Desktop hover buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isHovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="flex space-x-2 w-full justify-center"
+              className="hidden md:flex space-x-2 w-full justify-center"
             >
               {isPdfFile(pdfUrl) && (
                 <button
@@ -114,6 +115,34 @@ const MediaPublicationCard: React.FC<MediaPublicationCardProps> = ({
                 Download
               </a>
             </motion.div>
+          </div>
+          
+          {/* Mobile buttons - always visible */}
+          <div className="absolute bottom-0 left-0 right-0 md:hidden bg-gradient-to-t from-black/90 to-black/60 p-3 flex space-x-2 justify-center">
+            {isPdfFile(pdfUrl) && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowPdf(true);
+                }}
+                className="bg-white/90 text-primary hover:bg-white transition-colors duration-300 py-1.5 px-3 rounded-md flex items-center text-xs font-medium"
+                aria-label={`Preview ${title}`}
+              >
+                <Eye className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
+                Preview
+              </button>
+            )}
+            <a
+              href={pdfUrl}
+              download
+              onClick={handleDownload}
+              className="bg-primary/90 text-white hover:bg-primary transition-colors duration-300 py-1.5 px-3 rounded-md flex items-center text-xs font-medium"
+              aria-label={`Download ${title}`}
+            >
+              <Download className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
+              Download
+            </a>
           </div>
           
           {/* Publication date badge - always visible for accessibility */}
