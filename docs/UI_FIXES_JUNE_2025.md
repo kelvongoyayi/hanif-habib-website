@@ -2,7 +2,18 @@
 
 ## Issues Fixed
 
-### 1. PDF Viewer Zoom Cutoff Issue - UPDATED
+### 1. PDF Loading Stuck Issue - NEW FIX
+**Problem**: PDFs were stuck in "Loading..." state and never displayed.
+
+**Solution**:
+- Removed external loading state management
+- Let react-pdf's Document component handle loading internally
+- Ensured Document component is always rendered when there's no error
+- Passed proper loading component to Document's loading prop
+
+**Files Modified**: `src/shared/components/ui/PDFViewer.tsx`
+
+### 2. PDF Viewer Zoom Cutoff Issue - UPDATED
 **Problem**: When zooming PDFs, content was being cut off from the left and top sides and users couldn't scroll to see the full content.
 
 **Solution**:
@@ -14,7 +25,7 @@
 
 **Files Modified**: `src/shared/components/ui/PDFViewer.tsx`
 
-### 2. Mobile Preview/Download Buttons - UPDATED
+### 3. Mobile Preview/Download Buttons - UPDATED
 **Problem**: Always-visible buttons on mobile didn't look good and cluttered the interface.
 
 **Solution**:
@@ -26,7 +37,7 @@
 
 **Files Modified**: `src/features/media/components/MediaPublicationCard.tsx`
 
-### 3. Initial Card Visibility on Resources Page
+### 4. Initial Card Visibility on Resources Page
 **Problem**: When opening the Resources page, cards wouldn't appear until the user scrolled, creating a blank page experience.
 
 **Solution**:
