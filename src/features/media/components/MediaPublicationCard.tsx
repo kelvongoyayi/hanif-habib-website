@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, lazy, Suspense, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Download, Eye, Newspaper, Calendar, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -32,6 +32,7 @@ const MediaPublicationCard: React.FC<MediaPublicationCardProps> = ({
   const [showPdf, setShowPdf] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [downloadStarted, setDownloadStarted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Default brand-aligned placeholder image
   const defaultPlaceholder = "/Hanif_Habib_Cco_Logo.svg";
@@ -49,14 +50,39 @@ const MediaPublicationCard: React.FC<MediaPublicationCardProps> = ({
     }, 2000);
   };
 
+  // Handle mobile card click
+  const handleMobileCardClick = (e: React.MouseEvent) => {
+    // Only toggle menu if clicking on the image area
+    const target = e.target as HTMLElement;
+    if (!target.closest('button') && !target.closest('a')) {
+      setIsMobileMenuOpen(!isMobileMenuOpen);
+    }
+  };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isMobileMenuOpen) {
+        const target = e.target as HTMLElement;
+        if (!target.closest('.media-card')) {
+          setIsMobileMenuOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isMobileMenuOpen]);
+
   return (
     <>
       <motion.div 
-        className="h-full group flex flex-col"
+        className="h-full group flex flex-col media-card"
         whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
         transition={{ duration: 0.3 }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
+        onClick={handleMobileCardClick}
       >
         <CardContainer 
           className="h-full group flex flex-col"
@@ -81,14 +107,16 @@ const MediaPublicationCard: React.FC<MediaPublicationCardProps> = ({
             }}
           />
           
-          {/* Gradient overlay - accessible with keyboard focus */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 md:group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-            {/* Desktop hover buttons */}
+          {/* Gradient overlay - accessible with keyboard focus and mobile tap */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent transition-opacity duration-300 flex items-end p-4 ${
+            isHovered || isMobileMenuOpen ? 'opacity-100' : 'opacity-0 md:opacity-0'
+          }`}>
+            {/* Buttons for both desktop and mobile */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={isHovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              animate={(isHovered || isMobileMenuOpen) ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="hidden md:flex space-x-2 w-full justify-center"
+              className="flex space-x-2 w-full justify-center"
             >
               {isPdfFile(pdfUrl) && (
                 <button
@@ -117,38 +145,20 @@ const MediaPublicationCard: React.FC<MediaPublicationCardProps> = ({
             </motion.div>
           </div>
           
-          {/* Mobile buttons - always visible */}
-          <div className="absolute bottom-0 left-0 right-0 md:hidden bg-gradient-to-t from-black/90 to-black/60 p-3 flex space-x-2 justify-center">
-            {isPdfFile(pdfUrl) && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowPdf(true);
-                }}
-                className="bg-white/90 text-primary hover:bg-white transition-colors duration-300 py-1.5 px-3 rounded-md flex items-center text-xs font-medium"
-                aria-label={`Preview ${title}`}
-              >
-                <Eye className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
-                Preview
-              </button>
-            )}
-            <a
-              href={pdfUrl}
-              download
-              onClick={handleDownload}
-              className="bg-primary/90 text-white hover:bg-primary transition-colors duration-300 py-1.5 px-3 rounded-md flex items-center text-xs font-medium"
-              aria-label={`Download ${title}`}
-            >
-              <Download className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
-              Download
-            </a>
-          </div>
-          
           {/* Publication date badge - always visible for accessibility */}
           <div className="absolute top-0 left-0 m-3 bg-white/80 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-gray-700 flex items-center">
             <Calendar className="h-3 w-3 mr-1" aria-hidden="true" />
             {formattedDate}
+          </div>
+
+          {/* Mobile tap indicator */}
+          <div className="absolute top-3 right-3 md:hidden">
+            <div className="bg-black/60 backdrop-blur-sm rounded-full p-2 text-white">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </div>
           </div>
 
           {/* Download feedback badge */}

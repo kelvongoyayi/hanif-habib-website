@@ -30,7 +30,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 800);
   const viewerRef = useRef<HTMLDivElement>(null);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -79,29 +78,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       setIsFullscreen(!!document.fullscreenElement);
     };
 
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    window.addEventListener('resize', handleResize);
     
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
-  // Calculate optimal PDF width for different screen sizes
-  const getPDFWidth = () => {
-    if (windowWidth < 640) { // Mobile
-      return windowWidth - 20;
-    } else if (windowWidth < 1024) { // Tablet
-      return Math.min(windowWidth - 40, 700);
-    } else { // Desktop
-      return Math.min(windowWidth - 80, 800);
-    }
-  };
+
 
   // Memoize options to prevent unnecessary reloads
   const documentOptions = useMemo(() => ({
@@ -211,62 +195,65 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       )}
       
       {/* PDF Document */}
-      <div className="flex-1 overflow-auto bg-[#1b1b1b] flex items-center justify-center p-4">
-        {loading && (
-          <div className="text-center py-10">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-            <p className="mt-4 text-white/70">Loading PDF...</p>
-          </div>
-        )}
-        
-        {error && (
-          <div className="text-center py-10 px-4">
-            <div className="p-6 bg-red-500/10 rounded-lg max-w-lg mx-auto">
-              <p className="text-red-400 mb-4 text-sm">{error}</p>
-              <div className="space-y-3">
-                <a 
-                  href={pdfUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block text-blue-400 hover:text-blue-300 underline text-sm"
-                >
-                  Try opening PDF in new tab
-                </a>
-                <br />
-                <button
-                  onClick={() => {
-                    setError(null);
-                    setLoading(true);
-                  }}
-                  className="inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors text-sm"
-                >
-                  Retry Loading
-                </button>
+      <div className="flex-1 overflow-hidden bg-[#1b1b1b] flex items-center justify-center relative">
+        <div className="absolute inset-0 overflow-auto flex items-center justify-center p-4">
+          {loading && (
+            <div className="text-center py-10">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+              <p className="mt-4 text-white/70">Loading PDF...</p>
+            </div>
+          )}
+          
+          {error && (
+            <div className="text-center py-10 px-4">
+              <div className="p-6 bg-red-500/10 rounded-lg max-w-lg mx-auto">
+                <p className="text-red-400 mb-4 text-sm">{error}</p>
+                <div className="space-y-3">
+                  <a 
+                    href={pdfUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block text-blue-400 hover:text-blue-300 underline text-sm"
+                  >
+                    Try opening PDF in new tab
+                  </a>
+                  <br />
+                  <button
+                    onClick={() => {
+                      setError(null);
+                      setLoading(true);
+                    }}
+                    className="inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors text-sm"
+                  >
+                    Retry Loading
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        
-        <div className={`${!loading && !error ? 'flex items-center justify-center w-full h-full' : 'hidden'}`}>
-          <Document
-            file={pdfUrl}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={onDocumentLoadError}
-            loading={<div className="h-full w-full flex items-center justify-center"></div>}
-            className="flex items-center justify-center"
-            options={documentOptions}
-          >
-            {!error && (
-              <Page 
-                pageNumber={pageNumber} 
-                scale={scale}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-                className="shadow-xl"
-                width={scale > 1.0 ? undefined : getPDFWidth()}
-              />
-            )}
-          </Document>
+          )}
+          
+          {!loading && !error && (
+            <div className="flex items-center justify-center min-w-full min-h-full">
+              <Document
+                file={pdfUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={onDocumentLoadError}
+                loading={null}
+                className="flex items-center justify-center"
+                options={documentOptions}
+              >
+                <div className="flex items-center justify-center" style={{ margin: 'auto' }}>
+                  <Page 
+                    pageNumber={pageNumber} 
+                    scale={scale}
+                    renderTextLayer={true}
+                    renderAnnotationLayer={true}
+                    className="shadow-xl"
+                  />
+                </div>
+              </Document>
+            </div>
+          )}
         </div>
       </div>
       
