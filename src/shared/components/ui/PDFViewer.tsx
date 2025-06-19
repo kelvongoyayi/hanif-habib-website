@@ -28,14 +28,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.2);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const viewerRef = useRef<HTMLDivElement>(null);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPageNumber(1);
-    setLoading(false);
     setError(null);
   };
 
@@ -43,7 +41,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     console.error('Error loading PDF:', error);
     console.error('PDF URL:', pdfUrl);
     setError(`Failed to load PDF: ${error.message}`);
-    setLoading(false);
   };
 
   const changePage = (offset: number) => {
@@ -197,13 +194,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
       {/* PDF Document */}
       <div className="flex-1 overflow-hidden bg-[#1b1b1b] flex items-center justify-center relative">
         <div className="absolute inset-0 overflow-auto flex items-center justify-center p-4">
-          {loading && (
-            <div className="text-center py-10">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-              <p className="mt-4 text-white/70">Loading PDF...</p>
-            </div>
-          )}
-          
           {error && (
             <div className="text-center py-10 px-4">
               <div className="p-6 bg-red-500/10 rounded-lg max-w-lg mx-auto">
@@ -221,7 +211,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
                   <button
                     onClick={() => {
                       setError(null);
-                      setLoading(true);
                     }}
                     className="inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors text-sm"
                   >
@@ -232,13 +221,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
             </div>
           )}
           
-          {!loading && !error && (
+          {!error && (
             <div className="flex items-center justify-center min-w-full min-h-full">
               <Document
                 file={pdfUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={onDocumentLoadError}
-                loading={null}
+                loading={
+                  <div className="text-center py-10">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                    <p className="mt-4 text-white/70">Loading PDF...</p>
+                  </div>
+                }
                 className="flex items-center justify-center"
                 options={documentOptions}
               >
