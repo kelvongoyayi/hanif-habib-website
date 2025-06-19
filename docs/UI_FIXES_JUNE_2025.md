@@ -2,25 +2,27 @@
 
 ## Issues Fixed
 
-### 1. PDF Viewer Zoom Cutoff Issue
-**Problem**: When zooming PDFs, content was being cut off from the left side and users couldn't scroll to see the full content.
+### 1. PDF Viewer Zoom Cutoff Issue - UPDATED
+**Problem**: When zooming PDFs, content was being cut off from the left and top sides and users couldn't scroll to see the full content.
 
 **Solution**:
-- Improved container styling with padding and proper centering
-- Removed fixed width constraint when zoom scale is greater than 1.0
-- Added a wrapper div with flex centering for better alignment
-- PDFs now properly center and allow full scrolling when zoomed
+- Restructured the container with proper overflow handling
+- Used absolute positioning within a relative container for better control
+- Removed fixed width constraints completely
+- Added nested containers with proper overflow settings
+- PDFs now properly center and allow full scrolling in all directions when zoomed
 
 **Files Modified**: `src/shared/components/ui/PDFViewer.tsx`
 
-### 2. Mobile Hover-Only Buttons
-**Problem**: Preview and Download buttons on MediaPublicationCard only appeared on hover, which doesn't work on mobile devices.
+### 2. Mobile Preview/Download Buttons - UPDATED
+**Problem**: Always-visible buttons on mobile didn't look good and cluttered the interface.
 
 **Solution**:
-- Added always-visible buttons specifically for mobile devices
-- Desktop retains the hover interaction for better aesthetics
-- Mobile buttons are positioned at the bottom with a gradient background
-- Slightly smaller button size on mobile for better space utilization
+- Changed to tap-to-show behavior on mobile (similar to desktop hover)
+- Buttons now appear with gradient overlay when card is tapped
+- Added visual tap indicator (eye icon) on mobile to hint at interactivity
+- Clicking outside the card closes the button overlay
+- Better user experience with cleaner interface
 
 **Files Modified**: `src/features/media/components/MediaPublicationCard.tsx`
 
@@ -39,14 +41,16 @@
 
 1. **PDF Zoom Testing**:
    - Open any PDF in the viewer
-   - Use zoom in/out buttons
-   - Verify content remains centered and scrollable at all zoom levels
+   - Use zoom in/out buttons multiple times
+   - Verify content remains accessible in all directions
+   - Test scrolling in all directions when zoomed
    - Test on both mobile and desktop
 
 2. **Mobile Button Testing**:
    - Open Media Publications on a mobile device
-   - Verify Preview and Download buttons are always visible
-   - Test button functionality
+   - Tap on a card to show Preview and Download buttons
+   - Tap outside to hide buttons
+   - Verify the eye indicator is visible on mobile only
 
 3. **Resources Page Testing**:
    - Navigate to Resources page
@@ -54,6 +58,11 @@
    - Check that scroll animations still work as expected
 
 ## Deployment Status
-- Changes committed to main branch
-- Deployment should complete within 1-3 minutes
-- Clear browser cache if issues persist 
+- All changes committed to main branch
+- Latest fixes pushed on commit `76ccc05`
+- Clear browser cache if issues persist
+
+## Mobile Interaction Guide
+- On mobile devices, tap the media card to reveal Preview and Download buttons
+- Look for the eye icon in the top-right corner as a visual hint
+- Tap anywhere outside the card to hide the buttons 
