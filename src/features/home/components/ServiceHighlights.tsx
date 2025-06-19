@@ -36,7 +36,7 @@ const ServiceHighlights = () => {
       icon: <Shield className="h-10 w-10 text-primary" />,
       link: '/services/audit',
       category: 'audit',
-      image: 'https://images.pexels.com/photos/7681522/pexels-photo-7681522.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      image: 'https://images.pexels.com/photos/95916/pexels-photo-95916.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       features: ['Internal Audit', 'External Audit', 'Compliance Review']
     },
     {
@@ -108,7 +108,7 @@ const ServiceHighlights = () => {
       icon: <TrendingUp className="h-10 w-10 text-primary" />,
       link: '/services/business-plans',
       category: 'advisory',
-      image: 'https://images.pexels.com/photos/7681926/pexels-photo-7681926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      image: 'https://images.pexels.com/photos/5673488/pexels-photo-5673488.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       features: ['Strategic Planning', 'Financial Projections', 'Market Analysis']
     },
     {

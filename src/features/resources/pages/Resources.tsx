@@ -24,6 +24,13 @@ const Resources = () => {
     const params = new URLSearchParams(location.search);
     return params.get('category') || 'all';
   });
+  
+  // Update active category when URL changes
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const category = params.get('category') || 'all';
+    setActiveCategory(category);
+  }, [location.search]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { isIntersecting: isInView, ref: sectionRef } = useIntersectionObserver();

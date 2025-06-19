@@ -13,6 +13,7 @@ import { CalculatorPage } from '../features/calculator';
 import OvertimeCalculator from '../features/calculator/pages/OvertimeCalculator';
 import TaxPlanningTools from '../features/calculator/pages/TaxPlanningTools';
 import BudgetImpactSimulator from '../features/calculator/pages/BudgetImpactSimulator';
+import ScrollToTop from '../shared/components/utils/ScrollToTop';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         v7_relativeSplatPath: true
       }}
     >
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />

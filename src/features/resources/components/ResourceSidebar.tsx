@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Search, FileText, BookOpen, Video, FileCheck, Newspaper, Calculator, X } from 'lucide-react';
 
 interface ResourceSidebarProps {
@@ -72,7 +73,14 @@ const ResourceSidebar: React.FC<ResourceSidebarProps> = ({
         {resourceCategories.map((category) => (
           <button
             key={category.id}
-            onClick={() => setActiveCategory(category.id)}
+            onClick={() => {
+              setActiveCategory(category.id);
+              // Smooth scroll to top when changing categories
+              window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              });
+            }}
             className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex items-center justify-between ${
               activeCategory === category.id 
                 ? 'bg-primary text-white' 
@@ -96,12 +104,12 @@ const ResourceSidebar: React.FC<ResourceSidebarProps> = ({
           Need assistance with finding specific resources?
         </p>
         
-        <a 
-          href="/contact" 
+        <Link 
+          to="/contact" 
           className="block w-full py-2 px-3 bg-primary text-white text-center rounded hover:bg-primary-dark transition-colors duration-300"
         >
           Contact Our Team
-        </a>
+        </Link>
       </div>
     </aside>
   );

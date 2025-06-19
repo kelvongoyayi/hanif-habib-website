@@ -22,7 +22,7 @@ const Services = () => {
       <PageHeader
         title="Our Services"
         subtitle="Comprehensive financial and advisory solutions tailored for your business needs"
-        backgroundImage="https://images.pexels.com/photos/7681522/pexels-photo-7681522.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+        backgroundImage="https://images.pexels.com/photos/95916/pexels-photo-95916.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
       >
         <div className="mt-8 flex flex-wrap gap-4">
           <Button 

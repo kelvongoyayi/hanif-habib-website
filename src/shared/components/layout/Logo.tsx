@@ -3,7 +3,7 @@ import mainLogo from '../../../assets/logos/Hanif_Habib_Cco_Main_Logo.svg';
 import whiteLogo from '../../../assets/logos/Hanif_Habib_Cco_White_Logo.svg';
 
 interface LogoProps {
-  variant?: 'default' | 'white';
+  variant?: 'default' | 'white' | 'colored';
 }
 
 const Logo: React.FC<LogoProps> = ({ variant = 'default' }) => {
@@ -18,7 +18,9 @@ const Logo: React.FC<LogoProps> = ({ variant = 'default' }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  const logoSrc = variant === 'white' || (!isScrolled && variant === 'default')
+  const logoSrc = variant === 'colored' 
+    ? mainLogo
+    : variant === 'white' || (!isScrolled && variant === 'default')
     ? whiteLogo
     : mainLogo;
   
